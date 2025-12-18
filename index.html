@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$SEND - ENTER IF U DARE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text y="24" font-size="24">💀</text></svg>'), auto;
+        }
+
+        :root {
+            --xp-blue: #245edb;
+            --xp-green: #3a8c3a;
+            --glitch-1: #ff0000;
+            --glitch-2: #00ff00;
+            --glitch-3: #0000ff;
+            --neon-pink: #ff00ff;
+            --neon-cyan: #00ffff;
+            --neon-yellow: #ffff00;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+        }
+
+        /* SCANLINES */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 9999;
+            animation: scanline-move 0.1s linear infinite;
+        }
+
+        @keyframes scanline-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 4px; }
+        }
+
+        /* GLOBAL GLITCH OVERLAY */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            pointer-events: none;
+            z-index: 9998;
+            animation: screen-glitch 8s infinite;
+        }
+
+        @keyframes screen-glitch {
+            0%, 90%, 100% { 
+                background: transparent;
+                transform: translate(0);
+            }
+            91% { 
+                background: rgba(255, 0, 0, 0.03);
+                transform: translate(-2px, 0);
+            }
+            92% { 
+                background: rgba(0, 255, 0, 0.03);
+                transform: translate(2px, 0);
+            }
+            93% { 
+                background: rgba(0, 0, 255, 0.03);
+                transform: translate(0, 2px);
+            }
+            94% {
+                background: transparent;
+                transform: translate(0);
+            }
+        }
+
+        /* ENTRY SCREEN */
+        #entry-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #1a0a2e 0%, #000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            flex-direction: column;
+        }
+
+        .entry-popup {
+            background: #c0c0c0;
+            border: 3px outset #fff;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.5), 0 0 100px rgba(255,0,255,0.3);
+            width: 420px;
+            animation: popup-shake 0.5s infinite, popup-glitch 4s infinite;
+        }
+
+        @keyframes popup-shake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-3px) rotate(-0.5deg); }
+            75% { transform: translateX(3px) rotate(0.5deg); }
+        }
+
+        @keyframes popup-glitch {
+            0%, 95%, 100% { filter: none; }
+            96% { filter: hue-rotate(90deg); }
+            97% { filter: hue-rotate(-90deg); }
+            98% { filter: saturate(2) brightness(1.2); }
+        }
+
+        .entry-popup-header {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            color: white;
+            padding: 4px 8px;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .entry-popup-body {
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(180deg, #c0c0c0 0%, #a0a0a0 100%);
+        }
+
+        .entry-popup-body p {
+            font-family: 'Tahoma', sans-serif;
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #000;
+        }
+
+        .send-btn {
+            background: linear-gradient(180deg, #4CAF50, #2E7D32);
+            border: 3px outset #6fdb6f;
+            padding: 15px 60px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-shadow: 2px 2px 0 #000;
+            animation: send-pulse 1s infinite;
+        }
+
+        .send-btn:hover {
+            background: linear-gradient(180deg, #66BB6A, #43A047);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--neon-cyan);
+        }
+
+        .send-btn:active {
+            border: 3px inset #6fdb6f;
+            transform: scale(0.95);
+        }
+
+        @keyframes send-pulse {
+            0%, 100% { box-shadow: 0 0 10px var(--neon-cyan); }
+            50% { box-shadow: 0 0 30px var(--neon-cyan), 0 0 60px var(--neon-pink); }
+        }
+
+        /* MAIN CONTENT */
+        #main-content {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+            animation: content-appear 0.5s ease-out;
+        }
+
+        @keyframes content-appear {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* TOP BAR */
+        .top-bar {
+            background: rgba(0, 0, 0, 0.95);
+            border-bottom: 3px solid var(--neon-cyan);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 5px 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .x-button {
+            background: linear-gradient(180deg, #ff6b6b, #c0392b);
+            border: 2px outset #ff9999;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+            animation: x-glitch 3s infinite;
+        }
+
+        @keyframes x-glitch {
+            0%, 95%, 100% { transform: translate(0); }
+            96% { transform: translate(-2px, 1px); }
+            97% { transform: translate(2px, -1px); }
+            98% { transform: translate(-1px, -1px); }
+        }
+
+        .x-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+
+        .ca-display {
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            animation: glitch-text 2s infinite;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ca-display span {
+            color: var(--neon-pink);
+            font-size: 14px;
+        }
+
+        .copy-btn {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 5px 10px;
+            font-family: 'VT323', monospace;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+        }
+
+        @keyframes glitch-text {
+            0%, 100% { text-shadow: 0 0 10px var(--neon-cyan); }
+            25% { text-shadow: -2px 0 var(--glitch-1), 2px 0 var(--glitch-2); }
+            50% { text-shadow: 2px 0 var(--glitch-1), -2px 0 var(--glitch-3); }
+            75% { text-shadow: 0 0 20px var(--neon-pink); }
+        }
+
+        /* SLIDING $SEND MARQUEE */
+        .send-marquee {
+            background: linear-gradient(90deg, #000, rgba(255,0,255,0.1), #000);
+            border-top: 2px solid var(--neon-pink);
+            border-bottom: 2px solid var(--neon-cyan);
+            padding: 8px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .send-marquee::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(255,0,255,0.1) 0%, 
+                transparent 20%, 
+                transparent 80%, 
+                rgba(0,255,255,0.1) 100%
+            );
+            pointer-events: none;
+        }
+
+        .send-marquee-content {
+            display: inline-block;
+            animation: send-scroll 10s linear infinite;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 14px;
+        }
+
+        .send-marquee-content span {
+            margin: 0 30px;
+            animation: rainbow-send 2s infinite;
+        }
+
+        .send-marquee-content span:nth-child(odd) {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .send-marquee-content span:nth-child(even) {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        @keyframes send-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes rainbow-send {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(30deg); }
+        }
+
+        /* HERO */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,0,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0,255,255,0.1) 0%, transparent 50%);
+            animation: bg-pulse 4s infinite;
+        }
+
+        @keyframes bg-pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .hero-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(32px, 12vw, 100px);
+            color: white;
+            text-shadow: 
+                6px 6px 0 var(--neon-pink),
+                -3px -3px 0 var(--neon-cyan),
+                0 0 80px var(--neon-pink),
+                0 0 120px var(--neon-cyan);
+            animation: mega-glitch 3s infinite;
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-title::before,
+        .hero-title::after {
+            content: '$SEND';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            overflow: hidden;
+        }
+
+        .hero-title::before {
+            color: var(--glitch-1);
+            animation: glitch-1 0.3s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+            transform: translate(-3px);
+        }
+
+        .hero-title::after {
+            color: var(--glitch-2);
+            animation: glitch-2 0.3s infinite;
+            clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+            transform: translate(3px);
+        }
+
+        @keyframes mega-glitch {
+            0%, 100% { transform: translate(0) skewX(0deg); }
+            20% { transform: translate(-3px, 3px) skewX(0.5deg); }
+            40% { transform: translate(3px, -3px) skewX(-0.5deg); }
+            60% { transform: translate(-3px, -3px) skewX(0.5deg); }
+            80% { transform: translate(3px, 3px) skewX(-0.5deg); }
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translateX(0); opacity: 0.8; }
+            20% { transform: translateX(-5px); opacity: 1; }
+            40% { transform: translateX(5px); opacity: 0.6; }
+            60% { transform: translateX(-3px); opacity: 0.9; }
+            80% { transform: translateX(3px); opacity: 0.7; }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translateX(0); opacity: 0.8; }
+            20% { transform: translateX(5px); opacity: 0.6; }
+            40% { transform: translateX(-5px); opacity: 1; }
+            60% { transform: translateX(3px); opacity: 0.7; }
+            80% { transform: translateX(-3px); opacity: 0.9; }
+        }
+
+        .hero-subtitle {
+            font-family: 'Comic Neue', cursive;
+            font-size: 24px;
+            color: var(--neon-cyan);
+            margin-top: 20px;
+            animation: subtitle-glitch 5s infinite;
+            position: relative;
+        }
+
+        @keyframes subtitle-glitch {
+            0%, 90%, 100% { 
+                transform: translate(0);
+                text-shadow: 0 0 10px var(--neon-cyan);
+            }
+            92% { 
+                transform: translate(-5px, 2px);
+                text-shadow: 3px 0 var(--glitch-1), -3px 0 var(--glitch-2);
+            }
+            94% { 
+                transform: translate(5px, -2px);
+                text-shadow: -3px 0 var(--glitch-1), 3px 0 var(--glitch-3);
+            }
+            96% {
+                transform: translate(0);
+                text-shadow: 0 0 20px var(--neon-pink);
+            }
+        }
+
+        /* STATS */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--neon-pink);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: stat-glitch 6s infinite;
+        }
+
+        .stat-box:nth-child(even) {
+            border-color: var(--neon-cyan);
+            animation-delay: 0.5s;
+        }
+
+        @keyframes stat-glitch {
+            0%, 95%, 100% { transform: translate(0); }
+            96% { transform: translate(-2px, 1px); }
+            97% { transform: translate(2px, -1px); }
+            98% { transform: translate(1px, 1px); }
+        }
+
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,0,255,0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .stat-label {
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            color: var(--neon-cyan);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 16px;
+            color: white;
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        /* GLITCHY GRAPH */
+        .graph-container {
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid var(--neon-cyan);
+            margin: 30px 20px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: graph-glitch 10s infinite;
+        }
+
+        @keyframes graph-glitch {
+            0%, 92%, 100% { 
+                transform: translate(0);
+                filter: none;
+            }
+            93% { 
+                transform: translate(-3px, 0);
+                filter: hue-rotate(90deg);
+            }
+            94% { 
+                transform: translate(3px, 0);
+                filter: hue-rotate(-90deg);
+            }
+            95% { 
+                transform: translate(0, 2px);
+                filter: saturate(2);
+            }
+        }
+
+        .graph-container::before {
+            content: '📈 $SEND CHART - ONLY UP 🚀';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            color: var(--neon-pink);
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .graph-svg {
+            width: 100%;
+            height: 200px;
+            filter: drop-shadow(0 0 10px var(--neon-cyan));
+        }
+
+        .graph-line {
+            fill: none;
+            stroke: url(#graphGradient);
+            stroke-width: 3;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 3s forwards infinite;
+        }
+
+        .graph-line-glitch {
+            fill: none;
+            stroke: var(--neon-pink);
+            stroke-width: 2;
+            opacity: 0.5;
+            animation: glitch-line 0.3s infinite;
+        }
+
+        .graph-line-glitch2 {
+            fill: none;
+            stroke: var(--glitch-2);
+            stroke-width: 2;
+            opacity: 0.3;
+            animation: glitch-line 0.3s infinite reverse;
+        }
+
+        @keyframes draw {
+            0% { stroke-dashoffset: 1000; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        @keyframes glitch-line {
+            0%, 100% { transform: translate(0); }
+            25% { transform: translate(-4px, 2px); }
+            50% { transform: translate(4px, -2px); }
+            75% { transform: translate(-2px, -2px); }
+        }
+
+        /* MINI GRAPHS */
+        .mini-graphs {
+            display: flex;
+            gap: 15px;
+            padding: 0 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .mini-graph {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--neon-cyan);
+            padding: 10px;
+            width: 150px;
+            animation: mini-glitch 7s infinite;
+        }
+
+        .mini-graph:nth-child(even) {
+            animation-delay: 1s;
+        }
+
+        @keyframes mini-glitch {
+            0%, 97%, 100% { transform: translate(0); }
+            98% { transform: translate(-2px, 1px) skewX(1deg); }
+            99% { transform: translate(2px, -1px) skewX(-1deg); }
+        }
+
+        .mini-graph-title {
+            font-family: 'VT323', monospace;
+            font-size: 12px;
+            color: var(--neon-pink);
+            margin-bottom: 5px;
+        }
+
+        .mini-graph canvas {
+            width: 100%;
+            height: 50px;
+        }
+
+        /* XP WINDOWS */
+        .xp-window {
+            background: #c0c0c0;
+            border: 3px outset #fff;
+            position: absolute;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+            animation: window-float 6s ease-in-out infinite, window-glitch 8s infinite;
+        }
+
+        @keyframes window-float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+
+        @keyframes window-glitch {
+            0%, 93%, 100% { filter: none; opacity: 1; }
+            94% { filter: hue-rotate(90deg); opacity: 0.8; }
+            95% { filter: hue-rotate(-90deg); opacity: 0.9; }
+            96% { filter: none; opacity: 1; }
+        }
+
+        .xp-title-bar {
+            background: linear-gradient(180deg, #0a246a 0%, #a6caf0 8%, #0a246a 100%);
+            color: white;
+            padding: 3px 5px;
+            font-size: 11px;
+            font-family: Tahoma, sans-serif;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .xp-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .xp-btn {
+            width: 16px;
+            height: 14px;
+            background: #c0c0c0;
+            border: 1px outset #fff;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .xp-btn.close {
+            background: #c0392b;
+            color: white;
+        }
+
+        .xp-content {
+            padding: 15px;
+            font-family: Tahoma, sans-serif;
+            font-size: 12px;
+        }
+
+        /* SOCIAL BUTTONS */
+        .social-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 30px;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            background: linear-gradient(180deg, #c0c0c0, #808080);
+            border: 3px outset #fff;
+            padding: 15px 30px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            color: #000;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.1s;
+            animation: social-glitch 9s infinite;
+        }
+
+        .social-btn:nth-child(2) { animation-delay: 0.3s; }
+        .social-btn:nth-child(3) { animation-delay: 0.6s; }
+        .social-btn:nth-child(4) { animation-delay: 0.9s; }
+
+        @keyframes social-glitch {
+            0%, 96%, 100% { transform: translate(0); }
+            97% { transform: translate(-2px, 1px); }
+            98% { transform: translate(2px, -1px); }
+            99% { transform: translate(0, 2px); }
+        }
+
+        .social-btn:hover {
+            border: 3px inset #fff;
+            transform: scale(1.05) !important;
+            box-shadow: 0 0 30px var(--neon-cyan);
+        }
+
+        /* NYAN CAT */
+        .nyan-cat {
+            position: fixed;
+            bottom: 20px;
+            animation: nyan-move 8s linear infinite;
+            z-index: 999;
+        }
+
+        @keyframes nyan-move {
+            0% { left: -150px; }
+            100% { left: 100%; }
+        }
+
+        .nyan-rainbow {
+            position: fixed;
+            bottom: 35px;
+            height: 30px;
+            background: linear-gradient(180deg, 
+                #ff0000 0%, #ff0000 16.66%,
+                #ff8800 16.66%, #ff8800 33.33%,
+                #ffff00 33.33%, #ffff00 50%,
+                #00ff00 50%, #00ff00 66.66%,
+                #0088ff 66.66%, #0088ff 83.33%,
+                #8800ff 83.33%, #8800ff 100%
+            );
+            animation: rainbow-trail 8s linear infinite;
+            z-index: 998;
+        }
+
+        @keyframes rainbow-trail {
+            0% { left: -500px; width: 500px; }
+            100% { left: 100%; width: 500px; }
+        }
+
+        /* SKULL RAIN */
+        .skull {
+            position: fixed;
+            font-size: 30px;
+            animation: fall linear infinite;
+            z-index: 40;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* VHS EFFECT */
+        .vhs-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9997;
+            overflow: hidden;
+        }
+
+        .vhs-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.03);
+            animation: vhs-scan 8s linear infinite;
+        }
+
+        @keyframes vhs-scan {
+            0% { top: -10%; }
+            100% { top: 110%; }
+        }
+
+        /* VISITOR COUNTER */
+        .visitor-counter {
+            background: #000;
+            border: 2px inset #808080;
+            padding: 10px 20px;
+            text-align: center;
+            font-family: 'VT323', monospace;
+            color: #00ff00;
+            margin: 20px auto;
+            width: fit-content;
+            animation: counter-glitch 5s infinite;
+        }
+
+        @keyframes counter-glitch {
+            0%, 97%, 100% { transform: translate(0); color: #00ff00; }
+            98% { transform: translate(-2px, 1px); color: #ff00ff; }
+            99% { transform: translate(2px, -1px); color: #00ffff; }
+        }
+
+        /* WEBRING */
+        .webring {
+            text-align: center;
+            padding: 20px;
+            font-family: 'Comic Neue', cursive;
+            font-size: 14px;
+            color: var(--neon-cyan);
+        }
+
+        .webring a {
+            color: var(--neon-pink);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .webring a:hover {
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            font-family: 'VT323', monospace;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid rgba(255,0,255,0.3);
+        }
+
+        /* FLOATING EMOJIS */
+        .floating-emoji {
+            position: fixed;
+            font-size: 40px;
+            animation: emoji-float 15s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.7;
+        }
+
+        @keyframes emoji-float {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-30px) rotate(10deg) scale(1.1); }
+            50% { transform: translateY(10px) rotate(-10deg) scale(0.9); }
+            75% { transform: translateY(-20px) rotate(5deg) scale(1.05); }
+        }
+
+        /* CHROMATIC ABERRATION ON EVERYTHING */
+        .chromatic {
+            animation: chromatic-shift 4s infinite;
+        }
+
+        @keyframes chromatic-shift {
+            0%, 100% { 
+                text-shadow: 0 0 10px currentColor;
+            }
+            25% { 
+                text-shadow: -2px 0 #ff0000, 2px 0 #00ffff;
+            }
+            50% { 
+                text-shadow: 2px 0 #ff0000, -2px 0 #00ffff;
+            }
+            75% { 
+                text-shadow: 0 -2px #ff0000, 0 2px #00ffff;
+            }
+        }
+
+        /* ERROR POPUP */
+        .error-popup {
+            position: fixed;
+            z-index: 200;
+            animation: error-shake 0.3s infinite;
+        }
+
+        @keyframes error-shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-1deg); }
+            75% { transform: rotate(1deg); }
+        }
+
+        /* GLITCH IMAGE EFFECT */
+        .glitch-img {
+            animation: img-glitch 5s infinite;
+        }
+
+        @keyframes img-glitch {
+            0%, 90%, 100% { 
+                filter: none;
+                transform: translate(0);
+            }
+            91% { 
+                filter: hue-rotate(90deg) saturate(2);
+                transform: translate(-2px, 0);
+            }
+            93% { 
+                filter: hue-rotate(-90deg);
+                transform: translate(2px, 0);
+            }
+            95% { 
+                filter: invert(0.1);
+                transform: translate(0, 2px);
+            }
+        }
+
+        /* UNDER CONSTRUCTION */
+        .under-construction {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            font-family: 'Comic Neue', cursive;
+            color: yellow;
+            animation: construction-flash 1s infinite;
+        }
+
+        @keyframes construction-flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ENTRY SCREEN -->
+    <div id="entry-screen">
+        <div class="entry-popup">
+            <div class="entry-popup-header">
+                <span>⚠️ $SEND Portal</span>
+                <span>❌</span>
+            </div>
+            <div class="entry-popup-body">
+                <p style="font-size: 64px; margin-bottom: 10px;">📧</p>
+                <p style="font-family: 'Press Start 2P', monospace; font-size: 12px; color: var(--neon-pink);">WELCOME TO $SEND</p>
+                <p style="margin-top: 15px;"><b>u about to enter the send zone frfr</b></p>
+                <p style="font-size: 11px; color: #666; margin-bottom: 25px;">click send to continue no cap 💀</p>
+                <button class="send-btn" onclick="enterSite()">📧 SEND 📧</button>
+            </div>
+        </div>
+        <p style="color: #666; margin-top: 30px; font-family: 'VT323', monospace; font-size: 14px;">
+            💀 NFA 💀 DYOR 💀 WAGMI 💀
+        </p>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+        <!-- VHS LINES -->
+        <div class="vhs-lines">
+            <div class="vhs-line" style="animation-delay: 0s;"></div>
+            <div class="vhs-line" style="animation-delay: 2s;"></div>
+            <div class="vhs-line" style="animation-delay: 4s;"></div>
+            <div class="vhs-line" style="animation-delay: 6s;"></div>
+        </div>
+
+        <!-- FLOATING EMOJIS -->
+        <div class="floating-emoji" style="top: 15%; left: 5%;">📧</div>
+        <div class="floating-emoji" style="top: 25%; right: 8%; animation-delay: -3s;">💀</div>
+        <div class="floating-emoji" style="top: 60%; left: 3%; animation-delay: -6s;">🚀</div>
+        <div class="floating-emoji" style="top: 70%; right: 5%; animation-delay: -9s;">💎</div>
+        <div class="floating-emoji" style="top: 40%; left: 8%; animation-delay: -12s;">🗿</div>
+
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <button class="x-button" onclick="closeAlert()">✖ [X]</button>
+            <div class="ca-display">
+                CA: <span>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</span>
+                <button class="copy-btn" onclick="copyCA()">📋 COPY</button>
+            </div>
+        </div>
+
+        <!-- $SEND SLIDING MARQUEE -->
+        <div class="send-marquee">
+            <div class="send-marquee-content">
+                <span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span><span>$SEND</span>
+            </div>
+        </div>
+
+        <!-- HERO -->
+        <div class="hero">
+            <h1 class="hero-title">$SEND</h1>
+            <p class="hero-subtitle chromatic">📧 just send it bro 📧</p>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-label">📊 MARKET CAP</div>
+                <div class="stat-value chromatic">$69M</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">💎 HOLDERS</div>
+                <div class="stat-value chromatic">42,069</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">🔥 24H VOLUME</div>
+                <div class="stat-value chromatic">$4.2M</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">📈 ATH</div>
+                <div class="stat-value chromatic">$0.069</div>
+            </div>
+        </div>
+
+        <!-- GLITCHY GRAPH -->
+        <div class="graph-container">
+            <svg class="graph-svg" viewBox="0 0 800 200">
+                <defs>
+                    <linearGradient id="graphGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:var(--neon-cyan);stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:var(--neon-pink);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:var(--neon-cyan);stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Grid -->
+                <g stroke="#333" stroke-width="0.5">
+                    <line x1="0" y1="50" x2="800" y2="50" />
+                    <line x1="0" y1="100" x2="800" y2="100" />
+                    <line x1="0" y1="150" x2="800" y2="150" />
+                    <line x1="100" y1="0" x2="100" y2="200" />
+                    <line x1="200" y1="0" x2="200" y2="200" />
+                    <line x1="300" y1="0" x2="300" y2="200" />
+                    <line x1="400" y1="0" x2="400" y2="200" />
+                    <line x1="500" y1="0" x2="500" y2="200" />
+                    <line x1="600" y1="0" x2="600" y2="200" />
+                    <line x1="700" y1="0" x2="700" y2="200" />
+                </g>
+                <!-- Glitch Lines -->
+                <path class="graph-line-glitch" d="M0,180 Q100,150 150,140 T250,120 T350,80 T450,90 T550,40 T650,60 T750,20 T800,30" />
+                <path class="graph-line-glitch2" d="M0,180 Q100,150 150,140 T250,120 T350,80 T450,90 T550,40 T650,60 T750,20 T800,30" />
+                <!-- Main Line -->
+                <path class="graph-line" d="M0,180 Q100,150 150,140 T250,120 T350,80 T450,90 T550,40 T650,60 T750,20 T800,30" />
+                <!-- Candles -->
+                <g>
+                    <rect x="95" y="130" width="10" height="30" fill="var(--neon-cyan)" />
+                    <rect x="195" y="100" width="10" height="40" fill="var(--neon-cyan)" />
+                    <rect x="295" y="70" width="10" height="30" fill="var(--neon-cyan)" />
+                    <rect x="395" y="80" width="10" height="25" fill="#ff4444" />
+                    <rect x="495" y="35" width="10" height="35" fill="var(--neon-cyan)" />
+                    <rect x="595" y="50" width="10" height="30" fill="#ff4444" />
+                    <rect x="695" y="15" width="10" height="40" fill="var(--neon-cyan)" />
+                </g>
+            </svg>
+            <p style="font-family: 'VT323', monospace; color: #00ff00; text-align: right; margin-top: 10px;">
+                📈 UP ONLY TECHNOLOGY 📈 | $SEND IT 🗿
+            </p>
+        </div>
+
+        <!-- MINI GRAPHS -->
+        <div class="mini-graphs">
+            <div class="mini-graph">
+                <div class="mini-graph-title">BUYS 🟢</div>
+                <canvas id="buy-graph"></canvas>
+            </div>
+            <div class="mini-graph">
+                <div class="mini-graph-title">SELLS 🔴</div>
+                <canvas id="sell-graph"></canvas>
+            </div>
+            <div class="mini-graph">
+                <div class="mini-graph-title">VOLUME 📊</div>
+                <canvas id="volume-graph"></canvas>
+            </div>
+            <div class="mini-graph">
+                <div class="mini-graph-title">SENDERS 📧</div>
+                <canvas id="holder-graph"></canvas>
+            </div>
+        </div>
+
+        <!-- SOCIAL BUTTONS -->
+        <div class="social-container">
+            <a href="#" class="social-btn">🐦 TWITTER</a>
+            <a href="#" class="social-btn">📱 TELEGRAM</a>
+            <a href="#" class="social-btn">📊 DEXSCREENER</a>
+            <a href="#" class="social-btn">💰 BUY $SEND</a>
+        </div>
+
+        <!-- UNDER CONSTRUCTION -->
+        <div class="under-construction">
+            <span style="font-size: 30px;">🚧</span>
+            <span>MORE FEATURES COMING SOON</span>
+            <span style="font-size: 30px;">🚧</span>
+        </div>
+
+        <!-- VISITOR COUNTER -->
+        <div class="visitor-counter">
+            👁️ SENDERS ONLINE: <span id="visitor-count">69420</span> | 📧 SEND LEVEL: MAXIMUM
+        </div>
+
+        <!-- XP WINDOWS -->
+        <div class="xp-window" style="top: 200px; left: 20px; width: 180px; z-index: 90;">
+            <div class="xp-title-bar">
+                <span>📧 gm.txt</span>
+                <div class="xp-buttons">
+                    <div class="xp-btn">_</div>
+                    <div class="xp-btn">□</div>
+                    <div class="xp-btn close">×</div>
+                </div>
+            </div>
+            <div class="xp-content">
+                <p>gm senders 📧</p>
+                <p>wagmi frens 🤝</p>
+                <p>$SEND IT 🚀</p>
+            </div>
+        </div>
+
+        <div class="xp-window" style="top: 350px; right: 20px; width: 200px; z-index: 90;">
+            <div class="xp-title-bar">
+                <span>⚠️ Alert</span>
+                <div class="xp-buttons">
+                    <div class="xp-btn">_</div>
+                    <div class="xp-btn">□</div>
+                    <div class="xp-btn close">×</div>
+                </div>
+            </div>
+            <div class="xp-content" style="text-align: center;">
+                <p style="font-size: 24px;">🗿</p>
+                <p><b>ngmi if u dont send</b></p>
+                <button style="margin-top: 10px; padding: 5px 20px;">Cope</button>
+            </div>
+        </div>
+
+        <!-- NYAN CAT -->
+        <div class="nyan-cat">
+            <span style="font-size: 40px;" class="glitch-img">📧</span>
+        </div>
+        <div class="nyan-rainbow"></div>
+
+        <!-- SKULL CONTAINER -->
+        <div id="skull-container"></div>
+
+        <!-- WEBRING -->
+        <div class="webring">
+            🔗 <a href="#">⬅️ PREV</a> | $SEND WEBRING | <a href="#">NEXT ➡️</a> 🔗
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>© 2024 $SEND | NFA | DYOR | JUST SEND IT</p>
+            <p style="margin-top: 10px;">made with 📧 and pure degeneracy</p>
+            <p style="margin-top: 5px; font-size: 10px;">best viewed on a Nokia 3310</p>
+        </div>
+    </div>
+
+    <script>
+        // ENTRY FUNCTION
+        function enterSite() {
+            document.getElementById('entry-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            spawnSkulls();
+            animateCounters();
+            drawMiniGraphs();
+            startGlitchEffects();
+        }
+
+        // CLOSE ALERT
+        function closeAlert() {
+            const popup = document.createElement('div');
+            popup.className = 'xp-window error-popup';
+            popup.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; width: 300px;';
+            popup.innerHTML = `
+                <div class="xp-title-bar">
+                    <span>⚠️ Error 404</span>
+                    <div class="xp-buttons">
+                        <div class="xp-btn close" onclick="this.parentElement.parentElement.parentElement.remove()">×</div>
+                    </div>
+                </div>
+                <div class="xp-content" style="text-align: center;">
+                    <p style="font-size: 32px;">🗿</p>
+                    <p><b>exit not found lmao</b></p>
+                    <p style="font-size: 10px; margin-top: 5px;">once u send, u cant unsend</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 5px 20px;">Cope</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        // COPY CA
+        function copyCA() {
+            navigator.clipboard.writeText('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+            const btn = event.target;
+            btn.textContent = '✅ COPIED';
+            setTimeout(() => btn.textContent = '📋 COPY', 2000);
+        }
+
+        // SPAWN SKULLS
+        function spawnSkulls() {
+            const container = document.getElementById('skull-container');
+            const emojis = ['💀', '📧', '🗿', '🚀', '💎', '☠️'];
+            
+            setInterval(() => {
+                const skull = document.createElement('div');
+                skull.className = 'skull';
+                skull.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                skull.style.left = Math.random() * window.innerWidth + 'px';
+                skull.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                container.appendChild(skull);
+                
+                setTimeout(() => skull.remove(), 5000);
+            }, 600);
+        }
+
+        // ANIMATE COUNTERS
+        function animateCounters() {
+            const counter = document.getElementById('visitor-count');
+            setInterval(() => {
+                const current = parseInt(counter.textContent);
+                counter.textContent = current + Math.floor(Math.random() * 10);
+            }, 2000);
+        }
+
+        // DRAW MINI GRAPHS
+        function drawMiniGraphs() {
+            const graphs = ['buy-graph', 'sell-graph', 'volume-graph', 'holder-graph'];
+            const colors = ['#00ff00', '#ff0000', '#00ffff', '#ff00ff'];
+            
+            graphs.forEach((id, index) => {
+                const canvas = document.getElementById(id);
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                canvas.width = 130;
+                canvas.height = 50;
+                
+                function draw() {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.strokeStyle = colors[index];
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = colors[index];
+                    ctx.beginPath();
+                    
+                    for (let i = 0; i < canvas.width; i += 5) {
+                        const y = Math.random() * 30 + 10;
+                        if (i === 0) {
+                            ctx.moveTo(i, y);
+                        } else {
+                            ctx.lineTo(i, y);
+                        }
+                    }
+                    ctx.stroke();
+                }
+                
+                draw();
+                setInterval(draw, 400);
+            });
+        }
+
+        // START GLITCH EFFECTS
+        function startGlitchEffects() {
+            // Random screen glitch
+            setInterval(() => {
+                if (Math.random() > 0.95) {
+                    document.body.style.transform = `translate(${Math.random() * 4 - 2}px, ${Math.random() * 4 - 2}px)`;
+                    setTimeout(() => {
+                        document.body.style.transform = 'translate(0, 0)';
+                    }, 50);
+                }
+            }, 100);
+
+            // Random color flash
+            setInterval(() => {
+                if (Math.random() > 0.98) {
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: ${Math.random() > 0.5 ? 'rgba(255,0,255,0.05)' : 'rgba(0,255,255,0.05)'};
+                        pointer-events: none;
+                        z-index: 9996;
+                    `;
+                    document.body.appendChild(overlay);
+                    setTimeout(() => overlay.remove(), 100);
+                }
+            }, 200);
+        }
+
+        // RANDOM POPUP SPAWNER
+        setInterval(() => {
+            if (Math.random() > 0.85) {
+                const messages = [
+                    '📧 SEND DETECTED',
+                    '🐋 WHALE ALERT',
+                    '🔥 VOLUME SPIKE',
+                    '📈 BULLISH AF',
+                    '🗿 SEND MOMENT',
+                    '💎 DIAMOND HANDS'
+                ];
+                
+                const popup = document.createElement('div');
+                popup.className = 'xp-window error-popup';
+                popup.style.cssText = `
+                    top: ${Math.random() * 50 + 15}%;
+                    left: ${Math.random() * 50 + 15}%;
+                    width: 180px;
+                    z-index: 150;
+                `;
+                popup.innerHTML = `
+                    <div class="xp-title-bar">
+                        <span>📢 Alert</span>
+                        <div class="xp-buttons">
+                            <div class="xp-btn close" onclick="this.parentElement.parentElement.parentElement.remove()">×</div>
+                        </div>
+                    </div>
+                    <div class="xp-content" style="text-align: center;">
+                        <p>${messages[Math.floor(Math.random() * messages.length)]}</p>
+                    </div>
+                `;
+                document.body.appendChild(popup);
+                
+                setTimeout(() => popup.remove(), 3000);
+            }
+        }, 4000);
+
+        // CURSOR TRAIL
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.7) {
+                const trail = document.createElement('div');
+                trail.style.cssText = `
+                    position: fixed;
+                    left: ${e.clientX}px;
+                    top: ${e.clientY}px;
+                    width: 8px;
+                    height: 8px;
+                    background: ${Math.random() > 0.5 ? '#ff00ff' : '#00ffff'};
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: 9997;
+                    animation: trail-fade 0.5s forwards;
+                `;
+                document.body.appendChild(trail);
+                setTimeout(() => trail.remove(), 500);
+            }
+        });
+
+        // TRAIL FADE ANIMATION
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes trail-fade {
+                from { opacity: 1; transform: scale(1); }
+                to { opacity: 0; transform: scale(0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // KONAMI CODE
+        let konamiCode = [];
+        const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.key);
+            konamiCode = konamiCode.slice(-10);
+            
+            if (konamiCode.join(',') === konamiSequence.join(',')) {
+                document.body.style.animation = 'mega-glitch 0.1s infinite';
+                setTimeout(() => {
+                    document.body.style.animation = '';
+                    alert('📧 U FOUND THE SECRET 📧\n\nNOW $SEND HARDER');
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
